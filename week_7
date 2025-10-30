@@ -1,0 +1,63 @@
+
+
+
+1) 
+mkdir flask-docker-app
+cd flask-docker-app
+
+
+nano app1.py
+
+from flask import Flask
+import os
+
+app = Flask(__name__)
+
+@app.route('/')
+def hello():
+    name = os.getenv('NAME', 'World')
+    return f"Hello, {name}! Welcome to Docker."
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000)
+
+
+nano requirements.txt
+Flask==2.2.5
+
+
+nano Dockerfile1
+# Step 1: Use official Python image as base
+FROM python:3.9-slim
+
+# Step 2: Set working directory inside container
+WORKDIR /app
+
+# Step 3: Copy dependency file and install required packages
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Step 4: Copy application code into container
+COPY app1.py .
+
+# Step 5: Set environment variable
+ENV NAME=Suraj
+
+# Step 6: Expose Flask application port
+EXPOSE 5000
+
+# Step 7: Default command to run the Flask app
+CMD ["python", "app1.py"]
+
+
+
+sudo docker build -t flask-hello-app:v1 -f Dockerfile1 .
+sudo docker images
+sudo docker run -d --name flask-container -p 5000:5000 flask-hello-app:v1
+sudo docker ps
+http://localhost:5000
+
+
+
+
+
